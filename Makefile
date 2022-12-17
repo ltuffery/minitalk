@@ -6,7 +6,7 @@
 #    By: ltuffery <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/17 17:52:01 by ltuffery          #+#    #+#              #
-#    Updated: 2022/12/17 18:34:05 by ltuffery         ###   ########.fr        #
+#    Updated: 2022/12/17 18:40:28 by ltuffery         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,7 @@ CLIENT_OBJS	=	$(CLIENT_SRCS:.c=.o)
 %.o:			%.c
 	$(CC) $(CFLAGS) -c $^ -o $@
 
-all:			i $(SERVER) $(CLIENT)
+all:			$(SERVER) $(CLIENT)
 
 $(SERVER):		$(SERVER_OBJS)
 	@make -s -C $(LIBFT_DIR)
