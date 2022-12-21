@@ -6,7 +6,7 @@
 #    By: ltuffery <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/17 17:52:01 by ltuffery          #+#    #+#              #
-#    Updated: 2022/12/17 18:40:28 by ltuffery         ###   ########.fr        #
+#    Updated: 2022/12/21 15:46:44 by ltuffery         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ LIBFT_DIR	=	libft
 
 CC			=	clang
 
-CFLAGS		=	-Wall -Wextra -Werror
+CFLAGS		=	-Wall -Wextra -Werror -Ofast
 
 SERVER_SRCS	=	server.c
 
@@ -50,5 +50,11 @@ fclean:			clean
 	@make fclean -s -C $(LIBFT_DIR)
 
 re:				fclean all
+
+test:
+	@make -s -C $(LIBFT_DIR)
+	$(CC) $(CFLAGS) tests/client.c libft/libft.a -o tests/client
+	$(CC) $(CFLAGS) tests/server.c libft/libft.a -o tests/server
+	@make fclean -s -C $(LIBFT_DIR)
 
 .PHONY:			all clean fclean re
