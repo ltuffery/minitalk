@@ -6,7 +6,7 @@
 /*   By: ltuffery <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/17 18:02:23 by ltuffery          #+#    #+#             */
-/*   Updated: 2022/12/21 18:43:00 by ltuffery         ###   ########.fr       */
+/*   Updated: 2022/12/24 23:55:14 by ltuffery         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	send_end_string(int pid)
 	while (i < 8)
 	{
 		kill(pid, SIGUSR1);
-		usleep(1);
+		usleep(100);
 		i++;
 	}
 }
@@ -47,7 +47,7 @@ void	send(char *str, int pid)
 				kill(pid, SIGUSR2);
 			else
 				kill(pid, SIGUSR1);
-			usleep(1);
+			usleep(100);
 			bit--;
 		}
 		i++;
