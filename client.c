@@ -3,80 +3,63 @@
 /*                                                        :::      ::::::::   */
 /*   client.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ltuffery <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ltuffery <ltuffery@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/12/17 18:02:23 by ltuffery          #+#    #+#             */
-/*   Updated: 2022/12/24 23:55:14 by ltuffery         ###   ########.fr       */
+/*   Created: 2022/12/24 23:39:45 by ltuffery          #+#    #+#             */
+/*   Updated: 2022/12/25 00:50:29 by ltuffery         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft/includes/libft.h"
 #include <bits/types/siginfo_t.h>
 #include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
-int	g_message_is_send = 0;
+void	send(int pid, char *message);
 
-void	send_end_string(int pid)
+void	listen(int sig, siginfo_t *info, void *unused)
 {
-	int	i;
-
-	i = 0;
-	while (i < 8)
+	(void)unused;
+	if (sig == SIGUSR2)
+		send(info->si_pid, NULL);
+	else if (sig == SIGUSR1)
 	{
-		kill(pid, SIGUSR1);
-		usleep(100);
-		i++;
-	}
-}
-
-void	send(char *str, int pid)
-{
-	int	i;
-	int	bit;
-
-	i = 0;
-	while ((unsigned char)str[i] != '\0')
-	{
-		bit = 7;
-		while (bit > -1)
-		{
-			if ((unsigned char)str[i] & (1 << bit))
-				kill(pid, SIGUSR2);
-			else
-				kill(pid, SIGUSR1);
-			usleep(100);
-			bit--;
-		}
-		i++;
-	}
-	g_message_is_send = 1;
-	send_end_string(pid);
-}
-
-void	listen(int sig)
-{
-	if (g_message_is_send == 1 && sig == SIGUSR1)
-	{
-		g_message_is_send = 0;
-		ft_putendl_fd("Recu", 1);
+		ft_putendl_fd("Message bien recue\n", 1);
 		exit(0);
 	}
 }
 
+void	send(int pid, char *message)
+{
+	static char	*msg;
+	static int	i;
+	static int	j;
+
+	if (msg == NULL && message != NULL)
+		msg = message;
+	if (msg[i] & (1 << j))
+		kill(pid, SIGUSR2);
+	else
+		kill(pid, SIGUSR1);
+	if (j == 8)
+	{
+		j = 0;
+		i++;
+	}
+	else
+		j++;
+}
+
 int	main(int ac, char **av)
 {
-	int					pid;
 	struct sigaction	act;
 
 	if (ac != 3)
 		return (0);
-	pid = ft_atoi(av[1]);
-	act.sa_handler = &listen;
+	act.sa_sigaction = listen;
+	act.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &act, NULL);
-	send(av[2], pid);
+	sigaction(SIGUSR2, &act, NULL);
+	send(ft_atoi(av[1]), av[2]);
 	while (1)
 	{
 	}

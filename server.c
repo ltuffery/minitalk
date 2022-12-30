@@ -5,17 +5,14 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ltuffery <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/12/17 18:14:59 by ltuffery          #+#    #+#             */
-/*   Updated: 2022/12/21 18:43:58 by ltuffery         ###   ########.fr       */
+/*   Created: 2022/12/24 23:41:18 by ltuffery          #+#    #+#             */
+/*   Updated: 2022/12/30 06:33:15 by ltuffery         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft/includes/libft.h"
 #include <bits/types/siginfo_t.h>
-#include <stdio.h>
 #include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 int	ft_pow(int nb, int power)
 {
@@ -36,74 +33,68 @@ int	ft_pow(int nb, int power)
 	return (total);
 }
 
-void	ft_putstr(char *message)
+static char	*get_message(siginfo_t *info, char *msg, int *bit, int *i)
 {
-	int	i;
+	static int	j;
 
-	i = 0;
-	while (message[i] != '\0')
+	msg[j] = *bit;
+	if ((char)*bit == '\0')
 	{
-		write(1, &message[i], 1);
-		i++;
+		ft_putstr_fd(msg, 1);
+		free(msg);
+		msg = NULL;
+		j = 0;
+		*i = 0;
+		*bit = 0;
+		kill(info->si_pid, SIGUSR1);
+		return (msg);
 	}
-}
-
-char	*get_and_put_message(char *message, int bit, int *j)
-{
-	if (bit != 0)
-	{
-		message[*j] = (char) bit;
-		(*j)++;
-		return (message);
-	}
-	message[*j] = '\0';
-	*j = 0;
-	ft_putstr(message);
-	free(message);
-	return (NULL);
+	j++;
+	*i = 0;
+	*bit = 0;
+	return (msg);
 }
 
 void	listen(int sig, siginfo_t *info, void *unused)
 {
 	static int	i;
-	static int	j;
 	static int	bit;
 	static char	*message;
 
 	(void) unused;
 	if (message == NULL)
-		message = malloc(sizeof(char *) * (sizeof(size_t) * 8 + 1));
+		message = malloc(sizeof(size_t) * 8 + 1);
 	if (message == NULL)
 		return ;
-	if ((sig == SIGUSR2 || sig == SIGUSR1))
-	{
-		if (sig == SIGUSR2)
-			bit += ft_pow(2, 7 - i);
-		i++;
-	}
 	if (i == 8)
 	{
-		message = get_and_put_message(message, bit, &j);
-		if (message == NULL)
-			kill(info->si_pid, SIGUSR1);
-		bit = 0;
-		i = 0;
+		if ((char)bit == '\0')
+		{
+			message = get_message(info, message, &bit, &i);
+			return ;
+		}
+		message = get_message(info, message, &bit, &i);
 	}
+	else
+	{
+		if (sig == SIGUSR2)
+			bit += ft_pow(2, i);
+		i++;
+	}
+	kill(info->si_pid, SIGUSR2);
 }
 
 int	main(void)
 {
-	int					pid;
 	struct sigaction	act;
 
-	pid = getpid();
-	act.sa_flags = SA_SIGINFO;
 	act.sa_sigaction = listen;
+	act.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &act, NULL);
 	sigaction(SIGUSR2, &act, NULL);
-	printf("PID: %i\n\n", pid);
+	ft_putnbr_fd(getpid(), 1);
+	ft_putchar_fd('\n', 1);
 	while (1)
 	{
 	}
-	return (0);
 }
