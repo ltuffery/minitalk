@@ -6,7 +6,7 @@
 /*   By: ltuffery <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/24 23:41:18 by ltuffery          #+#    #+#             */
-/*   Updated: 2022/12/30 06:33:15 by ltuffery         ###   ########.fr       */
+/*   Updated: 2023/01/11 18:09:49 by ltuffery         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,23 +33,38 @@ int	ft_pow(int nb, int power)
 	return (total);
 }
 
-static char	*get_message(siginfo_t *info, char *msg, int *bit, int *i)
+static char	*join(char *str, char c)
 {
-	static int	j;
+	int		i;
+	int		len;
+	char	*new_str;
 
-	msg[j] = *bit;
+	i = 0;
+	len = ft_strlen(str);
+	new_str = malloc(sizeof(char) * (len + 2));
+	while (str[i] != '\0')
+	{
+		new_str[i] = str[i];
+		i++;
+	}
+	new_str[i] = c;
+	new_str[i + 1] = '\0';
+	return (new_str);
+}
+
+static char	*get_message(siginfo_t *info, char *msg, char *bit, int *i)
+{
+	msg = join(msg, (char)*bit);
 	if ((char)*bit == '\0')
 	{
 		ft_putstr_fd(msg, 1);
 		free(msg);
 		msg = NULL;
-		j = 0;
 		*i = 0;
 		*bit = 0;
 		kill(info->si_pid, SIGUSR1);
 		return (msg);
 	}
-	j++;
 	*i = 0;
 	*bit = 0;
 	return (msg);
@@ -63,17 +78,17 @@ void	listen(int sig, siginfo_t *info, void *unused)
 
 	(void) unused;
 	if (message == NULL)
-		message = malloc(sizeof(size_t) * 8 + 1);
+		message = ft_calloc(1, 1);
 	if (message == NULL)
 		return ;
 	if (i == 8)
 	{
 		if ((char)bit == '\0')
 		{
-			message = get_message(info, message, &bit, &i);
+			message = get_message(info, message, (char *)&bit, &i);
 			return ;
 		}
-		message = get_message(info, message, &bit, &i);
+		message = get_message(info, message, (char *)&bit, &i);
 	}
 	else
 	{
@@ -90,6 +105,7 @@ int	main(void)
 
 	act.sa_sigaction = listen;
 	act.sa_flags = SA_SIGINFO;
+	sigemptyset(&act.sa_mask);
 	sigaction(SIGUSR1, &act, NULL);
 	sigaction(SIGUSR2, &act, NULL);
 	ft_putnbr_fd(getpid(), 1);

@@ -6,7 +6,7 @@
 /*   By: ltuffery <ltuffery@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/24 23:39:45 by ltuffery          #+#    #+#             */
-/*   Updated: 2022/12/25 00:50:29 by ltuffery         ###   ########.fr       */
+/*   Updated: 2023/01/11 18:10:50 by ltuffery         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	listen(int sig, siginfo_t *info, void *unused)
 		send(info->si_pid, NULL);
 	else if (sig == SIGUSR1)
 	{
-		ft_putendl_fd("Message bien recue\n", 1);
+		ft_putendl_fd("Message received!", 1);
 		exit(0);
 	}
 }
@@ -57,6 +57,7 @@ int	main(int ac, char **av)
 		return (0);
 	act.sa_sigaction = listen;
 	act.sa_flags = SA_SIGINFO;
+	sigemptyset(&act.sa_mask);
 	sigaction(SIGUSR1, &act, NULL);
 	sigaction(SIGUSR2, &act, NULL);
 	send(ft_atoi(av[1]), av[2]);
