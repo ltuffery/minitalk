@@ -6,7 +6,7 @@
 #    By: ltuffery <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/17 17:52:01 by ltuffery          #+#    #+#              #
-#    Updated: 2022/12/30 06:34:29 by ltuffery         ###   ########.fr        #
+#    Updated: 2023/01/13 16:24:03 by ltuffery         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -50,5 +50,7 @@ fclean:			clean
 	@make fclean -s -C $(LIBFT_DIR)
 
 re:				fclean all
+
+bonus:			all
 
 .PHONY:			all clean fclean re
