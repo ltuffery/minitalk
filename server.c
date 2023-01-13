@@ -6,7 +6,7 @@
 /*   By: ltuffery <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/24 23:41:18 by ltuffery          #+#    #+#             */
-/*   Updated: 2023/01/11 18:09:49 by ltuffery         ###   ########.fr       */
+/*   Updated: 2023/01/13 17:22:47 by ltuffery         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,17 @@ static char	*join(char *str, char c)
 	i = 0;
 	len = ft_strlen(str);
 	new_str = malloc(sizeof(char) * (len + 2));
+	if (new_str == NULL)
+	{
+		free(str);
+		return (NULL);
+	}
 	while (str[i] != '\0')
 	{
 		new_str[i] = str[i];
 		i++;
 	}
+	free(str);
 	new_str[i] = c;
 	new_str[i + 1] = '\0';
 	return (new_str);
@@ -55,6 +61,8 @@ static char	*join(char *str, char c)
 static char	*get_message(siginfo_t *info, char *msg, char *bit, int *i)
 {
 	msg = join(msg, (char)*bit);
+	if (msg == NULL)
+		return (NULL);
 	if ((char)*bit == '\0')
 	{
 		ft_putstr_fd(msg, 1);
